@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hospital Stock System</title>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- jsPDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<!-- Lucide Icons -->
+<script src="https://unpkg.com/lucide@latest"></script>
+
+<style>
+:root{
+  --bg:#0f172a;
+  --card:#1e293b;
+  --text:#fff;
+  --sidebar:#020617;
+}
+
+.light{
+  --bg:#f1f5f9;
+  --card:#fff;
+  --text:#0f172a;
+  --sidebar:#e2e8f0;
+}
+
+body{
+  margin:0;
+  font-family:Segoe UI;
+  background:var(--bg);
+  color:var(--text);
+}
+
+/* SIDEBAR */
+.sidebar{
+  width:240px;
+  height:100vh;
+  position:fixed;
+  padding:20px;
+  background:var(--sidebar);
+}
+
+.sidebar button{
+  width:100%;
+  margin:8px 0;
+  padding:10px;
+  border:none;
+  border-radius:6px;
+  background:#1e293b;
+  color:white;
+  display:flex;
+  gap:10px;
+  align-items:center;
+  cursor:pointer;
+  transition:0.3s;
+}
+
+.sidebar button:hover{
+  transform:translateX(5px);
+  background:#334155;
+}
+
+/* MAIN */
+.main{
+  margin-left:260px;
+  padding:20px;
+}
+
+.card{
+  background:var(--card);
+  padding:15px;
+  border-radius:10px;
+  margin-top:15px;
+  transition:0.3s;
+}
+
+.card:hover{
+  transform:translateY(-4px);
+}
+
+/* INPUT */
+input{
+  padding:10px;
+  margin:5px;
+  border-radius:6px;
+  border:none;
+}
+
+/* BUTTON */
+button.action{
+  background:#22c55e;
+  color:white;
+}
+
+/* HIDDEN */
+.hidden{display:none;}
+
+/* ANIMATION */
+.main > div{
+  animation:fade 0.3s ease;
+}
+
+@keyframes fade{
+  from{opacity:0;transform:translateY(10px);}
+  to{opacity:1;transform:translateY(0);}
+}
+</style>
+</head>
+
+<body>
+
+<!-- LOGIN -->
+<div id="loginPage">
+  <div class="card" style="width:300px;margin:120px auto;">
+    <h2>🏥 Login</h2>
+    <input id="email" placeholder="Email"><br>
+    <input id="password" type="password" placeholder="Password"><br>
+    <button onclick="login()">Login</button><br><br>
+    <button onclick="showForgot()">Forgot Password?</button>
+  </div>
+</div>
+
+<!-- FORGOT -->
+<div id="forgotPage" class="hidden">
+  <div class="card" style="width:300px;margin:120px auto;">
+    <h2>Reset Password</h2>
+    <input id="resetEmail" placeholder="Email"><br>
+    <button onclick="requestReset()">Send Reset Link</button>
+  </div>
+</div>
+
+<!-- RESET -->
+<div id="resetPage" class="hidden">
+  <div class="card" style="width:300px;margin:120px auto;">
+    <h2>New Password</h2>
+    <input id="newPassword" type="password"><br>
+    <button onclick="resetPassword()">Update Password</button>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app" class="hidden">
+
+<div class="sidebar">
+
+<h3>🏥 HMS</h3>
+
+<button onclick="show('dashboard')"><i data-lucide="layout-dashboard"></i> Dashboard</button>
+<button onclick="show('items')"><i data-lucide="boxes"></i> Items</button>
+<button onclick="show('stock')"><i data-lucide="warehouse"></i> Stock</button>
+<button onclick="show('reports')"><i data-lucide="file-text"></i> Reports</button>
+<button onclick="show('alerts')"><i data-lucide="alert-triangle"></i> Alerts</button>
+
+<button id="adminBtn" class="hidden" onclick="show('admin')">
+<i data-lucide="shield"></i> Admin
+</button>
+
+<button onclick="toggleTheme()"><i data-lucide="moon"></i> Theme</button>
+
+</div>
+
+<div class="main">
+
+<!-- DASHBOARD -->
+<div id="dashboard">
+  <h2>Dashboard</h2>
+  <div class="card">
+    <canvas id="chart"></canvas>
+  </div>
+</div>
+
+<!-- ITEMS -->
+<div id="items" class="hidden">
+  <h2>Items</h2>
+  <input id="name" placeholder="Item">
+  <input id="category" placeholder="Category">
+  <input id="unit" placeholder="Unit">
+  <input id="reorder" placeholder="Reorder">
+  <button class="action" onclick="addItem()">Add Item</button>
+  <div id="itemsList"></div>
+</div>
+
+<!-- STOCK -->
+<div id="stock" class="hidden">
+  <h2>Stock</h2>
+  <input id="item_id" placeholder="Item ID">
+  <input id="qty" placeholder="Quantity">
+  <button class="action" onclick="addStock()">Add Stock</button>
+</div>
+
+<!-- REPORTS -->
+<div id="reports" class="hidden">
+  <h2>Reports</h2>
+  <button onclick="downloadPDF()">Download PDF</button>
+</div>
+
+<!-- ALERTS -->
+<div id="alerts" class="hidden">
+  <h2>Alerts</h2>
+  <div id="alertsBox"></div>
+</div>
+
+<!-- ADMIN -->
+<div id="admin" class="hidden">
+  <h2>Admin Panel</h2>
+
+  <h3>Create Hospital</h3>
+  <input id="hName">
+  <button onclick="createHospital()">Create</button>
+
+  <h3>Create User</h3>
+  <input id="uName">
+  <input id="uEmail">
+  <input id="uPass">
+  <input id="uRole">
+  <input id="uHospital">
+  <button onclick="createUser()">Create User</button>
+
+  <h3>Create Invite</h3>
+  <input id="iEmail">
+  <input id="iRole">
+  <input id="iHospital">
+  <button onclick="createInvite()">Send Invite</button>
+</div>
+
+</div>
+</div>
+
+<script>
+
+const API = "https://script.google.com/macros/s/AKfycbw4eca_8EznHTJrT-YLw2mh6wnVrXahcIt9KCE7uDw4i_vG0l4rACt3QxLFSvnNlKIa8g/exec";
+
+let TOKEN = null;
+let resetToken = null;
+let inviteToken = null;
+let currentUser = null;
+
+/* THEME */
+(function(){
+  if(localStorage.getItem("theme")==="light"){
+    document.body.classList.add("light");
+  }
+})();
+
+/* NAV */
+function show(id){
+  document.querySelectorAll(".main > div").forEach(d=>d.classList.add("hidden"));
+  document.getElementById(id).classList.remove("hidden");
+}
+
+/* API */
+async function post(data){
+  data.token = TOKEN;
+  const res = await fetch(API,{
+    method:"POST",
+    body:JSON.stringify(data)
+  });
+  return res.json();
+}
+
+/* LOGIN */
+async function login(){
+  const res = await post({
+    action:"login",
+    email:email.value,
+    password:password.value
+  });
+
+  if(res.success){
+    TOKEN = res.token;
+    currentUser = res;
+
+    loginPage.classList.add("hidden");
+    app.classList.remove("hidden");
+
+    if(res.role==="super_admin"){
+      adminBtn.classList.remove("hidden");
+    }
+
+    lucide.createIcons();
+
+    loadChart();
+    loadItems();
+  }else{
+    alert("Login failed");
+  }
+}
+
+/* FORGOT */
+function showForgot(){
+  loginPage.classList.add("hidden");
+  forgotPage.classList.remove("hidden");
+}
+
+async function requestReset(){
+  const res = await post({
+    action:"requestPasswordReset",
+    email:resetEmail.value,
+    base_url:window.location.origin
+  });
+
+  alert("Check email for reset link");
+}
+
+/* RESET FLOW */
+const urlParams = new URLSearchParams(window.location.search);
+resetToken = urlParams.get("reset");
+
+if(resetToken){
+  loginPage.classList.add("hidden");
+  resetPage.classList.remove("hidden");
+}
+
+async function resetPassword(){
+  const res = await post({
+    action:"resetPassword",
+    token:resetToken,
+    password:newPassword.value
+  });
+
+  if(res.success){
+    alert("Password updated");
+    window.location.href = window.location.pathname;
+  }
+}
+
+/* ITEMS */
+async function addItem(){
+  await post({
+    action:"addItem",
+    name:name.value,
+    category:category.value,
+    unit:unit.value,
+    reorder:reorder.value
+  });
+}
+
+/* STOCK */
+async function addStock(){
+  await post({
+    action:"addStock",
+    item_id:item_id.value,
+    quantity:qty.value
+  });
+}
+
+/* CHART */
+async function loadChart(){
+  const data = await post({action:"getTransactions"});
+  let map={};
+
+  data.slice(1).forEach(t=>{
+    map[t[1]]=(map[t[1]]||0)+Number(t[3]);
+  });
+
+  new Chart(document.getElementById("chart"),{
+    type:"bar",
+    data:{
+      labels:Object.keys(map),
+      datasets:[{data:Object.values(map)}]
+    }
+  });
+}
+
+/* PDF */
+async function downloadPDF(){
+  const {jsPDF}=window.jspdf;
+  const doc=new jsPDF();
+
+  const data=await post({action:"getItems"});
+
+  let y=10;
+  data.slice(1).forEach(i=>{
+    doc.text(i[2],10,y);
+    y+=10;
+  });
+
+  doc.save("report.pdf");
+}
+
+/* ADMIN */
+async function createHospital(){
+  await post({action:"createHospital",name:hName.value});
+}
+
+async function createUser(){
+  await post({
+    action:"createUser",
+    hospital_id:uHospital.value,
+    name:uName.value,
+    email:uEmail.value,
+    password:uPass.value,
+    role:uRole.value
+  });
+}
+
+async function createInvite(){
+  const res = await post({
+    action:"createInvite",
+    email:iEmail.value,
+    role:iRole.value,
+    hospital_id:iHospital.value,
+    base_url:window.location.origin
+  });
+
+  alert(res.invite_link);
+}
+
+/* THEME */
+function toggleTheme(){
+  document.body.classList.toggle("light");
+
+  localStorage.setItem("theme",
+    document.body.classList.contains("light")?"light":"dark"
+  );
+}
+
+</script>
+
+</body>
+</html>
