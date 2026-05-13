@@ -864,6 +864,8 @@ function logout(){
    INIT
 ========================= */
 
+
+/* ========================= INITIAL LOGIC
 if(TOKEN){
 
   dashboard();
@@ -872,6 +874,46 @@ if(TOKEN){
 
   loginPage();
 }
+========================= */
+
+
+
+// =========================
+// INIT APP 
+// =========================
+
+const params = new URLSearchParams(window.location.search);
+
+const resetToken = params.get("reset");
+const inviteToken = params.get("invite");
+
+// RESET PASSWORD FLOW
+if(resetToken){
+
+  resetPasswordPage(resetToken);
+
+}
+
+// INVITE FLOW
+else if(inviteToken){
+
+  inviteAcceptPage(inviteToken);
+
+}
+
+// NORMAL LOGIN/DASHBOARD
+else{
+
+  if(TOKEN){
+
+    dashboard();
+
+  }else{
+
+    loginPage();
+  }
+}
+
 
 </script>
 
