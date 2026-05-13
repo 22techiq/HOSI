@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Hospital Stock Management System</title>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- Icons -->
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+
+<style>
+
+/* =========================
+   ROOT THEME
+========================= */
+
+:root{
+  --bg:#0f172a;
+  --card:#1e293b;
+  --card2:#111827;
+  --text:#f8fafc;
+  --muted:#94a3b8;
+  --primary:#2563eb;
+  --success:#22c55e;
+  --danger:#ef4444;
+  --border:#334155;
+}
+
+.light{
+  --bg:#f1f5f9;
+  --card:#ffffff;
+  --card2:#ffffff;
+  --text:#0f172a;
+  --muted:#475569;
+  --primary:#2563eb;
+  --success:#16a34a;
+  --danger:#dc2626;
+  --border:#cbd5e1;
+}
+
+/* =========================
+   GLOBAL
+========================= */
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+body{
+  font-family:Segoe UI;
+  background:var(--bg);
+  color:var(--text);
+  overflow:hidden;
+}
+
+button{
+  border:none;
+  cursor:pointer;
+  transition:.2s;
+}
+
+input,select{
+  width:100%;
+  padding:12px;
+  border-radius:10px;
+  border:1px solid var(--border);
+  background:transparent;
+  color:var(--text);
+  margin-top:10px;
+}
+
+input:focus,
+select:focus{
+  outline:none;
+  border-color:var(--primary);
+}
+
+/* =========================
+   LOGIN
+========================= */
+
+.login-page{
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  padding:20px;
+}
+
+.login-card{
+  width:100%;
+  max-width:400px;
+  background:var(--card);
+  padding:30px;
+  border-radius:20px;
+  animation:fadeIn .4s ease;
+  box-shadow:0 10px 30px rgba(0,0,0,.3);
+}
+
+.login-card h1{
+  margin-bottom:10px;
+}
+
+.login-card p{
+  color:var(--muted);
+  margin-bottom:20px;
+}
+
+.primary-btn{
+  width:100%;
+  padding:12px;
+  background:var(--primary);
+  color:white;
+  border-radius:10px;
+  margin-top:15px;
+  font-weight:bold;
+}
+
+.primary-btn:hover{
+  transform:translateY(-2px);
+}
+
+.link{
+  color:#60a5fa;
+  cursor:pointer;
+  margin-top:15px;
+  display:inline-block;
+  font-size:14px;
+}
+
+/* =========================
+   APP LAYOUT
+========================= */
+
+.app{
+  display:flex;
+  height:100vh;
+}
+
+/* =========================
+   SIDEBAR
+========================= */
+
+.sidebar{
+  width:250px;
+  background:var(--card2);
+  padding:20px;
+  border-right:1px solid var(--border);
+}
+
+.logo{
+  font-size:22px;
+  font-weight:bold;
+  margin-bottom:30px;
+}
+
+.nav-btn{
+  width:100%;
+  padding:14px;
+  margin-bottom:10px;
+  border-radius:12px;
+  background:transparent;
+  color:var(--text);
+  text-align:left;
+  font-size:15px;
+}
+
+.nav-btn:hover{
+  background:rgba(255,255,255,.08);
+}
+
+.nav-btn i{
+  margin-right:10px;
+}
+
+/* =========================
+   MAIN
+========================= */
+
+.main{
+  flex:1;
+  overflow:auto;
+  padding:25px;
+}
+
+/* =========================
+   CARDS
+========================= */
+
+.card{
+  background:var(--card);
+  border-radius:20px;
+  padding:20px;
+  margin-bottom:20px;
+  border:1px solid var(--border);
+  animation:fadeIn .3s ease;
+}
+
+.card-title{
+  margin-bottom:15px;
+}
+
+/* =========================
+   TABLE
+========================= */
+
+table{
+  width:100%;
+  border-collapse:collapse;
+}
+
+th,td{
+  padding:12px;
+  border-bottom:1px solid var(--border);
+  text-align:left;
+}
+
+th{
+  color:var(--muted);
+}
+
+/* =========================
+   GRID
+========================= */
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+  gap:20px;
+}
+
+.stat{
+  padding:20px;
+  border-radius:20px;
+  background:var(--card);
+  border:1px solid var(--border);
+}
+
+.stat h2{
+  margin-top:10px;
+}
+
+/* =========================
+   TOAST
+========================= */
+
+.toast{
+  position:fixed;
+  bottom:20px;
+  right:20px;
+  background:var(--success);
+  color:white;
+  padding:12px 20px;
+  border-radius:10px;
+  animation:fadeIn .3s ease;
+  z-index:999;
+}
+
+/* =========================
+   LOADER
+========================= */
+
+.loader{
+  width:20px;
+  height:20px;
+  border:3px solid white;
+  border-top:3px solid transparent;
+  border-radius:50%;
+  animation:spin 1s linear infinite;
+  margin:auto;
+}
+
+/* =========================
+   ANIMATIONS
+========================= */
+
+@keyframes fadeIn{
+  from{
+    opacity:0;
+    transform:translateY(10px);
+  }
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+}
+
+@keyframes spin{
+  to{
+    transform:rotate(360deg);
+  }
+}
+
+</style>
+</head>
+<body>
+
+<div id="root"></div>
+
+<script>
+
+/* =========================
+   CONFIG
+========================= */
+
+const API = "https://script.google.com/macros/s/AKfycbyNnYlVCYqGPGF_lCgYbzVAIkBvUANA_22egTlg6QwVTsIq11AXvBzRHHHgeHBF_BKdBQ/exec";
+
+/* =========================
+   STORAGE
+========================= */
+
+let TOKEN = localStorage.getItem("token") || "";
+let ROLE = localStorage.getItem("role") || "";
+
+/* =========================
+   HELPERS
+========================= */
+
+function toast(msg){
+
+  const t = document.createElement("div");
+  t.className = "toast";
+  t.innerText = msg;
+
+  document.body.appendChild(t);
+
+  setTimeout(()=>{
+    t.remove();
+  },3000);
+}
+
+async function post(data){
+
+  try{
+
+    const res = await fetch(API,{
+      method:"POST",
+      body:JSON.stringify(data)
+    });
+
+    return await res.json();
+
+  }catch(err){
+
+    console.error(err);
+
+    toast("Network error");
+
+    return {};
+  }
+}
+
+/* =========================
+   LOGIN PAGE
+========================= */
+
+function loginPage(){
+
+  root.innerHTML = `
+  
+  <div class="login-page">
+
+    <div class="login-card">
+
+      <h1>🏥 Hospital System</h1>
+
+      <p>Secure hospital inventory platform</p>
+
+      <input id="email" placeholder="Email">
+
+      <input id="password"
+      type="password"
+      placeholder="Password">
+
+      <button class="primary-btn"
+      onclick="login()">
+        Login
+      </button>
+
+      <span class="link"
+      onclick="forgotPassword()">
+        Forgot Password?
+      </span>
+
+    </div>
+
+  </div>
+  `;
+}
+
+/* =========================
+   LOGIN
+========================= */
+
+async function login(){
+
+  const btn = event.target;
+
+  btn.innerHTML = `<div class="loader"></div>`;
+
+  const res = await post({
+    action:"login",
+    email:email.value,
+    password:password.value
+  });
+
+  if(res.success){
+
+    TOKEN = res.token;
+    ROLE = res.role;
+
+    localStorage.setItem("token",TOKEN);
+    localStorage.setItem("role",ROLE);
+
+    dashboard();
+
+  }else{
+
+    toast("Invalid login");
+
+    btn.innerHTML = "Login";
+  }
+}
+
+/* =========================
+   FORGOT PASSWORD
+========================= */
+
+async function forgotPassword(){
+
+  const email = prompt("Enter your email");
+
+  if(!email) return;
+
+  await post({
+    action:"requestPasswordReset",
+    email:email,
+    base_url:location.origin
+  });
+
+  toast("If account exists, reset email sent");
+}
+
+/* =========================
+   DASHBOARD
+========================= */
+
+function dashboard(){
+
+  root.innerHTML = `
+
+  <div class="app">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+
+      <div class="logo">
+        🏥 MedStock
+      </div>
+
+      <button class="nav-btn"
+      onclick="homePage()">
+        <i class="fa fa-chart-line"></i>
+        Dashboard
+      </button>
+
+      <button class="nav-btn"
+      onclick="itemsPage()">
+        <i class="fa fa-box"></i>
+        Items
+      </button>
+
+      <button class="nav-btn"
+      onclick="stockPage()">
+        <i class="fa fa-warehouse"></i>
+        Stock
+      </button>
+
+      <button class="nav-btn"
+      onclick="alertsPage()">
+        <i class="fa fa-triangle-exclamation"></i>
+        Alerts
+      </button>
+
+      <button class="nav-btn"
+      onclick="invitePage()">
+        <i class="fa fa-user-plus"></i>
+        Invite Users
+      </button>
+
+      <button class="nav-btn"
+      onclick="toggleTheme()">
+        <i class="fa fa-moon"></i>
+        Theme
+      </button>
+
+      <button class="nav-btn"
+      onclick="logout()">
+        <i class="fa fa-right-from-bracket"></i>
+        Logout
+      </button>
+
+    </div>
+
+    <!-- MAIN -->
+    <div class="main" id="main"></div>
+
+  </div>
+  `;
+
+  homePage();
+}
+
+/* =========================
+   HOME
+========================= */
+
+function homePage(){
+
+  main.innerHTML = `
+
+  <div class="grid">
+
+    <div class="stat">
+      <small>Total Items</small>
+      <h2 id="totalItems">0</h2>
+    </div>
+
+    <div class="stat">
+      <small>Low Stock</small>
+      <h2 id="lowStock">0</h2>
+    </div>
+
+    <div class="stat">
+      <small>Active Session</small>
+      <h2>YES</h2>
+    </div>
+
+  </div>
+
+  <div class="card">
+
+    <div class="card-title">
+      Stock Analytics
+    </div>
+
+    <canvas id="chart"></canvas>
+
+  </div>
+  `;
+
+  renderChart();
+
+  loadStats();
+}
+
+/* =========================
+   CHART
+========================= */
+
+function renderChart(){
+
+  const ctx = document.getElementById("chart");
+
+  new Chart(ctx,{
+    type:"bar",
+    data:{
+      labels:[
+        "Medicines",
+        "Equipment",
+        "Consumables"
+      ],
+      datasets:[{
+        data:[12,19,8]
+      }]
+    }
+  });
+}
+
+/* =========================
+   LOAD STATS
+========================= */
+
+async function loadStats(){
+
+  const items = await post({
+    action:"getItems",
+    token:TOKEN
+  });
+
+  const alerts = await post({
+    action:"lowStock",
+    token:TOKEN
+  });
+
+  totalItems.innerText =
+    items.length ? items.length-1 : 0;
+
+  lowStock.innerText =
+    alerts.length || 0;
+}
+
+/* =========================
+   ITEMS PAGE
+========================= */
+
+async function itemsPage(){
+
+  const items = await post({
+    action:"getItems",
+    token:TOKEN
+  });
+
+  let html = `
+
+  <div class="card">
+
+    <div class="card-title">
+      Add Item
+    </div>
+
+    <input id="itemName"
+    placeholder="Item name">
+
+    <input id="itemCategory"
+    placeholder="Category">
+
+    <input id="itemUnit"
+    placeholder="Unit">
+
+    <input id="itemReorder"
+    placeholder="Reorder level">
+
+    <button class="primary-btn"
+    onclick="addItem()">
+      Add Item
+    </button>
+
+  </div>
+
+  <div class="card">
+
+    <div class="card-title">
+      Inventory Items
+    </div>
+
+    <table>
+
+      <tr>
+        <th>Name</th>
+        <th>Category</th>
+        <th>Unit</th>
+      </tr>
+  `;
+
+  items.slice(1).forEach(r=>{
+
+    html += `
+    <tr>
+      <td>${r[2]}</td>
+      <td>${r[3]}</td>
+      <td>${r[4]}</td>
+    </tr>
+    `;
+  });
+
+  html += `
+    </table>
+  </div>
+  `;
+
+  main.innerHTML = html;
+}
+
+/* =========================
+   ADD ITEM
+========================= */
+
+async function addItem(){
+
+  await post({
+    action:"addItem",
+    token:TOKEN,
+    name:itemName.value,
+    category:itemCategory.value,
+    unit:itemUnit.value,
+    reorder:itemReorder.value
+  });
+
+  toast("Item added");
+
+  itemsPage();
+}
+
+/* =========================
+   STOCK PAGE
+========================= */
+
+function stockPage(){
+
+  main.innerHTML = `
+
+  <div class="card">
+
+    <div class="card-title">
+      Add Stock
+    </div>
+
+    <input id="stockItemId"
+    placeholder="Item ID">
+
+    <input id="stockQuantity"
+    placeholder="Quantity">
+
+    <input id="stockBatch"
+    placeholder="Batch">
+
+    <button class="primary-btn"
+    onclick="addStock()">
+      Add Stock
+    </button>
+
+  </div>
+  `;
+}
+
+/* =========================
+   ADD STOCK
+========================= */
+
+async function addStock(){
+
+  await post({
+    action:"addStock",
+    token:TOKEN,
+    item_id:stockItemId.value,
+    quantity:stockQuantity.value,
+    batch:stockBatch.value
+  });
+
+  toast("Stock added");
+}
+
+/* =========================
+   ALERTS PAGE
+========================= */
+
+async function alertsPage(){
+
+  const alerts = await post({
+    action:"lowStock",
+    token:TOKEN
+  });
+
+  let html = `
+  <div class="card">
+
+    <div class="card-title">
+      Low Stock Alerts
+    </div>
+  `;
+
+  if(alerts.length === 0){
+
+    html += `<p>No alerts</p>`;
+
+  }else{
+
+    alerts.forEach(a=>{
+
+      html += `
+      <div style="
+      padding:12px;
+      margin-bottom:10px;
+      background:rgba(239,68,68,.1);
+      border-radius:10px;">
+        ⚠ ${a.item}
+        (${a.stock} left)
+      </div>
+      `;
+    });
+  }
+
+  html += `</div>`;
+
+  main.innerHTML = html;
+}
+
+/* =========================
+   INVITE PAGE
+========================= */
+
+function invitePage(){
+
+  main.innerHTML = `
+
+  <div class="card">
+
+    <div class="card-title">
+      Invite User
+    </div>
+
+    <input id="inviteEmail"
+    placeholder="User email">
+
+    <select id="inviteRole">
+      <option value="staff">Staff</option>
+      <option value="admin">Admin</option>
+    </select>
+
+    <button class="primary-btn"
+    onclick="sendInvite()">
+      Send Invite
+    </button>
+
+  </div>
+  `;
+}
+
+/* =========================
+   SEND INVITE
+========================= */
+
+async function sendInvite(){
+
+  await post({
+    action:"createInvite",
+    email:inviteEmail.value,
+    role:inviteRole.value,
+    hospital_id:"",
+    base_url:location.origin
+  });
+
+  toast("Invite email sent");
+}
+
+/* =========================
+   THEME
+========================= */
+
+function toggleTheme(){
+
+  document.body.classList.toggle("light");
+}
+
+/* =========================
+   LOGOUT
+========================= */
+
+function logout(){
+
+  localStorage.clear();
+
+  location.reload();
+}
+
+/* =========================
+   INIT
+========================= */
+
+if(TOKEN){
+
+  dashboard();
+
+}else{
+
+  loginPage();
+}
+
+</script>
+
+</body>
+</html>
