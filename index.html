@@ -915,6 +915,80 @@ else{
 }
 
 
+
+
+// =========================
+// RESET PASSWORD PAGE
+// =========================
+
+function resetPasswordPage(token){
+
+  root.innerHTML = `
+
+  <div class="login-page">
+
+    <div class="login-card">
+
+      <h1>🔐 Reset Password</h1>
+
+      <p>Create your new password</p>
+
+      <input id="newPassword"
+      type="password"
+      placeholder="New password">
+
+      <button class="primary-btn"
+      onclick="submitReset('${token}')">
+        Reset Password
+      </button>
+
+    </div>
+
+  </div>
+  `;
+}
+
+
+
+// =========================
+// SUBMIT RESET
+// =========================
+
+async function submitReset(token){
+
+  const password = newPassword.value;
+
+  if(password.length < 4){
+
+    toast("Password too short");
+
+    return;
+  }
+
+  const res = await post({
+    action:"resetPassword",
+    token:token,
+    password:password
+  });
+
+  if(res.success){
+
+    toast("Password reset successful");
+
+    setTimeout(()=>{
+
+      window.location.href =
+        window.location.origin +
+        window.location.pathname;
+
+    },1500);
+
+  }else{
+
+    toast(res.error || "Reset failed");
+  }
+}
+   
 </script>
 
 </body>
