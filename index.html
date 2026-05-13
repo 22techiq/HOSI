@@ -988,7 +988,121 @@ async function submitReset(token){
     toast(res.error || "Reset failed");
   }
 }
-   
+
+
+
+// =========================
+// INVITE ACCEPT PAGE
+// =========================
+
+async function inviteAcceptPage(token){
+
+  // Validate token first
+  const res = await post({
+    action:"validateInvite",
+    token:token
+  });
+
+  // Invalid invite
+  if(!res.valid){
+
+    root.innerHTML = `
+
+    <div class="login-page">
+
+      <div class="login-card">
+
+        <h1>❌ Invalid Invite</h1>
+
+        <p>This invite link is invalid or expired.</p>
+
+      </div>
+
+    </div>
+    `;
+
+    return;
+  }
+
+  // Valid invite
+  root.innerHTML = `
+
+  <div class="login-page">
+
+    <div class="login-card">
+
+      <h1>🏥 Accept Invite</h1>
+
+      <p>Create your account password</p>
+
+      <input id="inviteName"
+      placeholder="Full Name">
+
+      <input id="invitePassword"
+      type="password"
+      placeholder="Create Password">
+
+      <button class="primary-btn"
+      onclick="completeInvite('${token}')">
+        Create Account
+      </button>
+
+    </div>
+
+  </div>
+  `;
+}
+
+
+
+
+// =========================
+// COMPLETE INVITE
+// =========================
+
+async function completeInvite(token){
+
+  const name = inviteName.value;
+  const password = invitePassword.value;
+
+  if(name.length < 3){
+
+    toast("Enter full name");
+
+    return;
+  }
+
+  if(password.length < 4){
+
+    toast("Password too short");
+
+    return;
+  }
+
+  const res = await post({
+    action:"completeInvite",
+    token:token,
+    name:name,
+    password:password
+  });
+
+  if(res.success){
+
+    toast("Account created successfully");
+
+    setTimeout(()=>{
+
+      window.location.href =
+        window.location.origin +
+        window.location.pathname;
+
+    },1500);
+
+  }else{
+
+    toast(res.error || "Invite failed");
+  }
+}
 </script>
 
 </body>
