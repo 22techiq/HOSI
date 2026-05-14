@@ -1105,5 +1105,267 @@ async function completeInvite(token){
 }
 </script>
 
+<!-- =========================================
+🏥 SUPER ADMIN PANEL + HOSPITAL ONBOARDING UI
+ADD THIS INSIDE YOUR EXISTING FRONTEND <script>
+========================================= -->
+
+<script>
+
+/* =========================================
+SUPER ADMIN CHECK
+========================================= */
+
+function isSuperAdmin(){
+  return ROLE === "super_admin";
+}
+
+/* =========================================
+UPDATE DASHBOARD SIDEBAR
+REPLACE dashboard() SIDEBAR SECTION
+========================================= */
+
+// Add this button INSIDE sidebar buttons:
+
+/*
+
+<button class="nav-btn"
+onclick="superAdminPage()">
+  <i class="fa fa-hospital"></i>
+  Hospitals
+</button>
+
+*/
+
+/* =========================================
+SUPER ADMIN PAGE
+========================================= */
+
+async function superAdminPage(){
+
+  // security
+  if(!isSuperAdmin()){
+
+    toast("Unauthorized");
+
+    return;
+  }
+
+  main.innerHTML = `
+
+  <div class="grid">
+
+    <!-- CREATE HOSPITAL -->
+    <div class="card">
+
+      <div class="card-title">
+        🏥 Create Hospital
+      </div>
+
+      <input id="hospitalName"
+      placeholder="Hospital Name">
+
+      <input id="hospitalAdminEmail"
+      placeholder="Admin Email">
+
+      <button class="primary-btn"
+      onclick="createHospitalFrontend()">
+        Create Hospital
+      </button>
+
+    </div>
+
+    <!-- INVITE ADMIN -->
+    <div class="card">
+
+      <div class="card-title">
+        👤 Invite Hospital Admin
+      </div>
+
+      <input id="inviteHospitalId"
+      placeholder="Hospital ID">
+
+      <input id="inviteAdminEmail"
+      placeholder="Admin Email">
+
+      <button class="primary-btn"
+      onclick="inviteHospitalAdmin()">
+        Send Invite
+      </button>
+
+    </div>
+
+  </div>
+
+  <!-- HOSPITAL LIST -->
+  <div class="card">
+
+    <div class="card-title">
+      Registered Hospitals
+    </div>
+
+    <div id="hospitalList">
+      Loading hospitals...
+    </div>
+
+  </div>
+  `;
+
+  loadHospitals();
+}
+
+/* =========================================
+CREATE HOSPITAL
+========================================= */
+
+async function createHospitalFrontend(){
+
+  const name = hospitalName.value.trim();
+  const email = hospitalAdminEmail.value.trim();
+
+  if(!name || !email){
+
+    toast("Fill all fields");
+
+    return;
+  }
+
+  const btn = event.target;
+
+  btn.innerHTML = `<div class="loader"></div>`;
+
+  const res = await post({
+    action:"createHospital",
+    name:name,
+    admin_email:email
+  });
+
+  if(res.success){
+
+    toast("Hospital created");
+
+    hospitalName.value = "";
+    hospitalAdminEmail.value = "";
+
+    // Auto-fill hospital ID
+    inviteHospitalId.value = res.hospital_id;
+
+    loadHospitals();
+
+  }else{
+
+    toast("Failed");
+  }
+
+  btn.innerHTML = "Create Hospital";
+}
+
+/* =========================================
+INVITE HOSPITAL ADMIN
+========================================= */
+
+async function inviteHospitalAdmin(){
+
+  const hospitalId =
+    inviteHospitalId.value.trim();
+
+  const email =
+    inviteAdminEmail.value.trim();
+
+  if(!hospitalId || !email){
+
+    toast("Fill all fields");
+
+    return;
+  }
+
+  const btn = event.target;
+
+  btn.innerHTML = `<div class="loader"></div>`;
+
+  const res = await post({
+    action:"createInvite",
+    email:email,
+    hospital_id:hospitalId,
+    role:"admin",
+    base_url:location.origin + location.pathname
+  });
+
+  if(res.success){
+
+    toast("Invite email sent");
+
+    inviteAdminEmail.value = "";
+
+  }else{
+
+    toast("Invite failed");
+  }
+
+  btn.innerHTML = "Send Invite";
+}
+
+/* =========================================
+LOAD HOSPITALS
+========================================= */
+
+async function loadHospitals(){
+
+  // Backend endpoint required
+  const res = await post({
+    action:"getHospitals"
+  });
+
+  // if backend missing endpoint
+  if(!Array.isArray(res)){
+
+    hospitalList.innerHTML = `
+      <p style="color:red;">
+        Backend getHospitals() not added
+      </p>
+    `;
+
+    return;
+  }
+
+  let html = `
+
+  <table>
+
+    <tr>
+      <th>Hospital</th>
+      <th>Admin Email</th>
+      <th>Status</th>
+      <th>ID</th>
+    </tr>
+  `;
+
+  res.slice(1).forEach(r=>{
+
+    html += `
+    <tr>
+      <td>${r[1]}</td>
+      <td>${r[2]}</td>
+      <td>
+        <span style="
+          padding:5px 10px;
+          background:rgba(34,197,94,.15);
+          border-radius:30px;
+          color:#22c55e;">
+          ${r[3]}
+        </span>
+      </td>
+      <td>${r[0]}</td>
+    </tr>
+    `;
+  });
+
+  html += `</table>`;
+
+  hospitalList.innerHTML = html;
+}
+
+</script>
+   
 </body>
 </html>
