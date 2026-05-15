@@ -1344,6 +1344,14 @@ async function loadHospitals(){
       <th>Admin Email</th>
       <th>Status</th>
       <th>ID</th>
+
+
+<button class="primary-btn"
+onclick="printHospitalsPDF()">
+  Download PDF
+</button>
+
+      
     </tr>
   `;
 
@@ -1639,5 +1647,70 @@ resetInactivityTimer();
 </script>
 
    
+<script>
+/* ============================================
+PRINT HOSPITALS PDF
+============================================ */
+
+function printHospitalsPDF(){
+
+  const content =
+    document.getElementById("hospitalList")
+    .innerHTML;
+
+  const win = window.open("","PRINT");
+
+  win.document.write(`
+
+    <html>
+
+    <head>
+
+      <title>Hospitals Report</title>
+
+      <style>
+
+        body{
+          font-family:Arial;
+          padding:20px;
+        }
+
+        table{
+          width:100%;
+          border-collapse:collapse;
+        }
+
+        th,td{
+          border:1px solid #ccc;
+          padding:10px;
+          text-align:left;
+        }
+
+        h1{
+          margin-bottom:20px;
+        }
+
+      </style>
+
+    </head>
+
+    <body>
+
+      <h1>Hospital Registry Report</h1>
+
+      ${content}
+
+    </body>
+
+    </html>
+  `);
+
+  win.document.close();
+
+  win.focus();
+
+  win.print();
+}
+</script>
 </body>
 </html>
