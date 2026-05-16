@@ -733,6 +733,34 @@ function stockPage(){
       Add Stock
     </button>
 
+
+
+
+
+    <select id="stockOutItem">
+
+  <option value="">
+    Select Item
+  </option>
+
+</select>
+
+<input
+  id="stockOutQty"
+  type="number"
+  placeholder="Quantity">
+
+<button onclick="removeStock()">
+
+  Stock Out
+
+</button>
+
+
+
+
+
+
   </div>
   `;
 }
@@ -1710,6 +1738,51 @@ function printHospitalsPDF(){
   win.focus();
 
   win.print();
+}
+</script>
+
+
+<script>
+   /* ============================================
+REMOVE STOCK
+============================================ */
+
+async function removeStock(){
+
+  const TOKEN =
+    localStorage.getItem("TOKEN");
+
+  const itemId =
+    document.getElementById("stockOutItem")
+    .value;
+
+  const quantity =
+    document.getElementById("stockOutQty")
+    .value;
+
+  const res = await post({
+
+    action:"stockOut",
+
+    token:TOKEN,
+
+    item_id:itemId,
+
+    quantity:quantity
+  });
+
+  if(res.success){
+
+    toast(
+      "Stock removed successfully"
+    );
+
+  } else {
+
+    toast(
+      res.error || "Failed"
+    );
+  }
 }
 </script>
 </body>
