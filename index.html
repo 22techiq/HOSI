@@ -84,7 +84,7 @@ select:focus{
 /* =========================
    LOGIN
 ========================= */
-
+/*initial old code version
 .login-page{
   height:100vh;
   display:flex;
@@ -111,7 +111,141 @@ select:focus{
   color:var(--muted);
   margin-bottom:20px;
 }
+*/
+/* =========================================
+LOGIN SPLIT LAYOUT[IMPROVED VERSION]
+========================================= */
 
+.login-wrapper{
+
+  display:flex;
+
+  min-height:100vh;
+}
+
+/* =========================================
+LEFT SIDE
+========================================= */
+
+.login-left{
+
+  flex:1;
+
+  background:
+  linear-gradient(
+    rgba(0,0,0,.65),
+    rgba(0,0,0,.65)
+  ),
+  url('https://images.unsplash.com/photo-1587351021759-3e566b6af7cc?q=80&w=1200');
+
+  background-size:cover;
+  background-position:center;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  color:white;
+
+  padding:60px;
+}
+
+.overlay{
+
+  max-width:500px;
+}
+
+.overlay h1{
+
+  font-size:48px;
+  margin-bottom:20px;
+  line-height:1.2;
+}
+
+.overlay p{
+
+  font-size:18px;
+  line-height:1.7;
+  opacity:.95;
+}
+
+.features{
+
+  margin-top:30px;
+
+  display:flex;
+  flex-direction:column;
+
+  gap:14px;
+
+  font-size:16px;
+}
+
+/* =========================================
+RIGHT SIDE
+========================================= */
+
+.login-right{
+
+  width:420px;
+
+  background:var(--card);
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:40px;
+}
+
+.login-card{
+
+  width:100%;
+  max-width:400px;
+
+  background:transparent;
+
+  padding:0;
+
+  border-radius:20px;
+
+  animation:fadeIn .4s ease;
+}
+
+.login-card h1{
+
+  margin-bottom:10px;
+}
+
+.login-card p{
+
+  color:var(--muted);
+  margin-bottom:20px;
+}
+
+/* =========================================
+RESPONSIVE
+========================================= */
+
+@media(max-width:900px){
+
+  .login-left{
+
+    display:none;
+  }
+
+  .login-right{
+
+    width:100%;
+  }
+}
+
+
+
+
+
+
+   
 .primary-btn{
   width:100%;
   padding:12px;
