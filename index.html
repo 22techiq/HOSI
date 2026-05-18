@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<!-- Font Awesome -->
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <title>Hospital Stock Management System</title>
 
 <!-- Chart.js -->
@@ -498,6 +501,36 @@ th{
   }
 }
 
+
+
+.developer-credit{
+    display:flex;
+    align-items:center;
+    justify-content:flex-start;
+
+    gap:5px;
+
+    font-family:'Segoe UI',sans-serif;
+    font-size:11px;
+
+    color:#fff;
+}
+
+.developer-credit i{
+    font-size:12px;
+    color:#00d4ff;
+}
+
+.developer-credit a{
+    text-decoration:none;
+    color:#00d4ff;
+    font-weight:600;
+    transition:.3s;
+}
+
+.developer-credit a:hover{
+    opacity:.8;
+}
 </style>
 </head>
 <body>
@@ -618,95 +651,11 @@ function loginPage(){
         </h1>
 
 
-
-
-<!-- Font Awesome -->
-<link rel="stylesheet"
-href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-
 <div class="developer-credit">
     <i class="fas fa-code"></i>
-    Developed by 
+    <span>Developed by</span>
     <a href="#">McOwino</a>
 </div>
-
-<style>
-.developer-credit{
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    gap:5px;
-
-    padding:5px 10px;
-    margin-top:20px;
-
-    background:rgba(255,255,255,0.08);
-    backdrop-filter:blur(12px);
-
-    border:1px solid rgba(255,255,255,0.12);
-    border-radius:10px;
-
-    width:fit-content;
-    margin-left:auto;
-    margin-right:auto;
-
-    box-shadow:
-    0 10px 30px rgba(0,0,0,0.15);
-
-    font-family:'Segoe UI',sans-serif;
-    font-size:8px;
-    color:#fff;
-
-    transition:0.35s ease;
-}
-
-.developer-credit:hover{
-    transform:translateY(-4px) scale(1.02);
-
-    box-shadow:
-    0 18px 40px rgba(0,0,0,0.25);
-}
-
-.developer-credit i{
-    font-size:20px;
-    color:#00d4ff;
-
-    background:rgba(0,212,255,0.15);
-    padding:10px;
-    border-radius:50%;
-
-    box-shadow:
-    0 10px 30px rgba(0,0,0,0.15);
-}
-
-.developer-credit a{
-    text-decoration:none;
-
-    color:#00d4ff;
-    font-weight:700;
-
-    position:relative;
-}
-
-.developer-credit a::after{
-    content:'';
-    position:absolute;
-
-    left:0;
-    bottom:-3px;
-
-    width:0;
-    height:2px;
-
-    background:#00d4ff;
-
-    transition:0.3s;
-}
-
-.developer-credit a:hover::after{
-    width:100%;
-}
-</style>
 
 
 
